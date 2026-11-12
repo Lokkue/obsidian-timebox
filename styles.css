@@ -4,28 +4,41 @@
  * dark mode and in community themes.
  */
 
-/* ───────────── bar ───────────── */
+/* ───────────── bar ─────────────
+ * Quiet card: hairline border, generous padding, no heavy accent stripe.
+ * Hierarchy comes from size and tone, not weight; the accent color is
+ * reserved for what is live (running icon, progress).
+ */
 
 .timebox-bar {
   --timebox-accent: var(--interactive-accent);
   --timebox-break: var(--color-green);
-  border: 1px solid var(--background-modifier-border);
-  border-left: 3px solid var(--timebox-accent);
-  border-radius: var(--radius-m);
-  background-color: var(--background-secondary);
-  padding: var(--size-4-2) var(--size-4-3);
-  margin: var(--size-4-1) 0;
+  --timebox-border: var(--background-modifier-border);
+  position: relative;
+  border: 1px solid var(--timebox-border);
+  border-radius: var(--radius-l);
+  background-color: var(--background-primary);
+  padding: var(--size-4-3) var(--size-4-4);
+  margin: var(--size-4-2) 0;
   font-size: var(--font-ui-small);
-  line-height: var(--line-height-tight);
+  line-height: 1.45;
   color: var(--text-normal);
+  transition: border-color 0.2s ease;
+}
+
+/* Running: the border picks up a faint tint of the accent */
+.timebox-bar.is-active {
+  border-color: var(--timebox-accent);
+  border-color: color-mix(in srgb, var(--timebox-accent) 35%, var(--timebox-border));
 }
 
 .timebox-bar.is-break {
   --timebox-accent: var(--timebox-break);
 }
 
+/* Finished: recedes into the page */
 .timebox-bar.is-done {
-  border-left-color: var(--text-faint);
+  background-color: transparent;
 }
 
 .timebox-row {
@@ -38,37 +51,47 @@
 
 .timebox-icon {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
   color: var(--timebox-accent);
+  background-color: var(--background-modifier-hover);
+  background-color: color-mix(in srgb, var(--timebox-accent) 12%, transparent);
 }
 
 .timebox-bar.is-done .timebox-icon {
-  color: var(--text-muted);
+  color: var(--text-faint);
+  background-color: var(--background-modifier-hover);
 }
 
 .timebox-icon svg {
-  width: var(--icon-s);
-  height: var(--icon-s);
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  stroke-width: 2.25;
 }
 
-.timebox-bar.is-active .timebox-icon {
-  animation: timebox-pulse 2s ease-in-out infinite;
+.timebox-bar.is-active .timebox-icon svg {
+  animation: timebox-breathe 3s ease-in-out infinite;
 }
 
-@keyframes timebox-pulse {
+@keyframes timebox-breathe {
   50% {
-    opacity: 0.45;
+    opacity: 0.5;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .timebox-bar.is-active .timebox-icon {
+  .timebox-bar.is-active .timebox-icon svg {
     animation: none;
   }
 }
 
 .timebox-topic {
-  font-weight: var(--font-semibold);
+  font-size: var(--font-ui-medium);
+  font-weight: var(--font-medium);
   min-width: 0;
   max-width: 50%;
   overflow: hidden;
@@ -77,14 +100,13 @@
 }
 
 .timebox-times {
-  color: var(--text-muted);
+  color: var(--text-faint);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
 .timebox-running {
-  font-style: italic;
-  color: var(--text-faint);
+  color: var(--text-muted);
 }
 
 .timebox-dayshift {
@@ -94,14 +116,20 @@
 
 .timebox-elapsed {
   margin-left: auto;
-  font-family: var(--font-monospace);
+  font-size: var(--font-ui-medium);
+  font-weight: var(--font-medium);
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
   white-space: nowrap;
 }
 
 .timebox-bar.is-done .timebox-elapsed {
-  font-family: inherit;
-  font-weight: var(--font-semibold);
+  font-size: var(--font-ui-small);
+  font-weight: var(--font-normal);
+  color: var(--text-muted);
+}
+
+.timebox-bar.is-done .timebox-topic {
   color: var(--text-muted);
 }
 
@@ -112,9 +140,20 @@
   align-items: center;
   gap: var(--size-4-1);
   height: auto;
-  padding: var(--size-2-1) var(--size-4-2);
+  padding: var(--size-2-2) var(--size-4-3);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 999px;
+  background-color: transparent;
+  box-shadow: none;
+  color: var(--text-muted);
   font-size: var(--font-ui-smaller);
   cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.timebox-bar button.timebox-btn:hover {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
 }
 
 .timebox-bar button.timebox-btn.is-busy {
@@ -127,21 +166,23 @@
 }
 
 .timebox-btn-icon svg {
-  width: var(--icon-xs);
-  height: var(--icon-xs);
+  width: 11px;
+  height: 11px;
+  fill: currentColor;
 }
 
 /* ───────────── pomodoro ───────────── */
 
 .timebox-pomo {
-  margin-top: var(--size-4-2);
+  margin-top: var(--size-4-3);
+  padding-left: calc(26px + var(--size-4-3));
 }
 
 .timebox-pomo-label {
   color: var(--text-muted);
   font-size: var(--font-ui-smaller);
   font-variant-numeric: tabular-nums;
-  margin-bottom: var(--size-4-1);
+  margin-bottom: var(--size-4-2);
 }
 
 .timebox-bar.is-break .timebox-pomo-label {
@@ -149,8 +190,8 @@
 }
 
 .timebox-progress {
-  height: 4px;
-  border-radius: 2px;
+  height: 3px;
+  border-radius: 999px;
   background-color: var(--background-modifier-border);
   overflow: hidden;
 }
@@ -159,13 +200,15 @@
   --timebox-progress: 0%;
   height: 100%;
   width: var(--timebox-progress);
+  border-radius: inherit;
   background-color: var(--timebox-accent);
   transition: width 1s linear;
 }
 
 .timebox-meta {
   margin-top: var(--size-4-1);
-  color: var(--text-muted);
+  padding-left: calc(26px + var(--size-4-3));
+  color: var(--text-faint);
   font-size: var(--font-ui-smaller);
 }
 
@@ -173,19 +216,22 @@
 
 .timebox-error {
   display: flex;
-  gap: var(--size-4-2);
+  gap: var(--size-4-3);
   align-items: flex-start;
-  padding: var(--size-4-2) var(--size-4-3);
-  margin: var(--size-4-1) 0;
-  border: 1px dashed var(--text-error);
-  border-radius: var(--radius-s);
-  background-color: var(--background-secondary);
-  color: var(--text-normal);
+  padding: var(--size-4-3) var(--size-4-4);
+  margin: var(--size-4-2) 0;
+  border: 1px solid var(--text-error);
+  border: 1px solid color-mix(in srgb, var(--text-error) 35%, var(--background-modifier-border));
+  border-radius: var(--radius-l);
+  background-color: var(--background-primary);
+  color: var(--text-muted);
   font-size: var(--font-ui-small);
+  line-height: 1.45;
 }
 
 .timebox-error-icon {
   display: inline-flex;
+  padding-top: 2px;
   color: var(--text-error);
 }
 
@@ -195,8 +241,8 @@
 }
 
 .timebox-error-title {
-  font-weight: var(--font-semibold);
-  color: var(--text-error);
+  font-weight: var(--font-medium);
+  color: var(--text-normal);
 }
 
 /* ───────────── status bar, modal, settings ───────────── */
